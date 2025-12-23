@@ -1,111 +1,369 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="index.css" />
-    <title>LIFF Starter</title>
-    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-<!--
-    <script src="https://static.line-scdn.net/liff/edge/2/non-ios-extensions_2_22_0.js" type="text/javascript"></script>
-    <script src="https://static.line-scdn.net/liff/sdk/v2/liff.js"></script>
--->
-  </head>
-  <body>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINEミニアプリ - ログイン</title>
     <style>
-      #text-button {
-        display: block;
-        cursor: pointer;
-        width: 160px;
-        text-align: center;
-        border: 1px solid #232323;
-        padding: 10px;
-      }
-    </style>
-    
-    <h1>LINE LIFFアプリ デモ</h1>
-    <p>ステータス: <span id="status">初期化中...</span></p>
-    <p>あなたの表示名: <span id="display-name">情報を取得中...</span></p>
-
-    <div id="text-button" onclick="getLiffProfile()">DisplayName</div>
-    <div id="text-button" onclick="click_login()">LogIn</div>
-    <div id="text-button" onclick="click_logout()">LogOut</div>
-
-    <script>
-        // ★ あなたのLIFF IDに置き換えてください
-        const MY_LIFF_ID = "2008611458-kaP7KYRo"; 
-
-        /**
-         * LIFF初期化処理
-         */
-        function initializeLiff() {
-            liff.init({
-                liffId: MY_LIFF_ID
-            })
-            .then(() => {
-                document.getElementById('status').textContent = '初期化成功';
-                // LIFF初期化が成功したら、次のステップへ
-                checkLoginStatus();
-            })
-            .catch((err) => {
-                document.getElementById('status').textContent = `初期化エラー: ${err.code}`;
-                console.error("LIFF Initialization failed", err);
-            });
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /**
-         * ログイン状態の確認と処理の分岐
-         */
-        function checkLoginStatus() {
-            if (liff.isLoggedIn()) {
-                document.getElementById('status').textContent = 'ログイン済み';
-                // ログインしていれば、プロフィールを取得
-                getLiffProfile();
-            } else {
-                document.getElementById('status').textContent = '未ログイン';
-                // 未ログインであれば、ログイン画面へリダイレクト
-                liff.login();
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #06c755 0%, #00b900 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #06c755;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .status-item span:first-child {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-item span:last-child {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-profile img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid #06c755;
+        }
+
+        .user-profile h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .user-profile p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-login {
+            background: #06c755;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background: #05b84b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3);
+        }
+
+        .btn-logout {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>📱 LINEミニアプリ</h1>
+            <p>ログインプロトタイプ</p>
+        </div>
+
+        <div class="loading" id="loading">読み込み中</div>
+        <div class="error" id="error"></div>
+
+        <!-- ログイン前の画面 -->
+        <div id="loginView">
+            <button class="btn btn-login" onclick="login()">LINEでログイン</button>
+            <div class="info-box">
+                <strong>💡 プロトタイプについて</strong>
+                このプロトタイプを動作させるには、LINE Developersコンソールでチャネルを作成し、LIFF IDを設定する必要があります。
+            </div>
+        </div>
+
+        <!-- ログイン後の画面 -->
+        <div id="profileView" style="display: none;">
+            <div class="user-profile">
+                <img id="userPicture" src="" alt="プロフィール画像">
+                <h2 id="userName"></h2>
+                <p id="userStatus"></p>
+            </div>
+
+            <div class="status show">
+                <h3>📊 ユーザー情報</h3>
+                <div class="status-item">
+                    <span>ユーザーID:</span>
+                    <span id="userId"></span>
+                </div>
+                <div class="status-item">
+                    <span>ログイン状態:</span>
+                    <span style="color: #06c755;">✓ ログイン済み</span>
+                </div>
+            </div>
+
+            <button class="btn btn-logout" onclick="logout()">ログアウト</button>
+        </div>
+    </div>
+
+    <!-- LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <script>
+        const LIFF_ID = '2008611458-kaP7KYRo'; // ここにLIFF IDを設定してください
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', async () => {
+            showLoading(true);
+            
+            try {
+                // LIFFの初期化（自動ログイン有効）
+                await liff.init({ 
+                    liffId: LIFF_ID,
+                    withLoginOnExternalBrowser: true // 外部ブラウザでも自動ログイン
+                });
+                
+                // ログイン状態の確認
+                if (liff.isLoggedIn()) {
+                    await displayUserProfile();
+                } else {
+                    // 自動的にログイン処理を実行
+                    liff.login();
+                }
+            } catch (error) {
+                console.error('LIFF初期化エラー:', error);
+                showError('LIFFの初期化に失敗しました: ' + error.message);
+            }
+            
+            showLoading(false);
+        });
+
+        // ログイン処理
+        async function login() {
+            try {
+                if (!liff.isLoggedIn()) {
+                    // LINEログイン画面へリダイレクト
+                    liff.login();
+                }
+            } catch (error) {
+                console.error('ログインエラー:', error);
+                showError('ログインに失敗しました: ' + error.message);
             }
         }
 
-        /**
-         * liff.getProfile() API呼び出し
-         */
-        function getLiffProfile() {
-            liff.getProfile()
-            .then(profile => {
-                // プロフィール情報を画面に表示
-                document.getElementById('display-name').textContent = profile.displayName;
-                console.log('Profile fetched:', profile);
-            })
-            .catch((err) => {
-                document.getElementById('display-name').textContent = 'プロフィールの取得に失敗しました';
-                console.error("Error getting profile", err);
-            });
+        // ログアウト処理
+        function logout() {
+            if (confirm('ログアウトしますか?')) {
+                liff.logout();
+                window.location.reload();
+            }
         }
-        
-        function update_status() {
-            document.getElementById('status').textContent = liff.isLoggedIn() ? 'ログイン' : '未ログイン';
-            getLiffProfile();
-        }
-        
-        function click_login() {
-            if (liff.isLoggedIn()) return;
 
-            liff.login();
-            update_status();
+        // ユーザープロフィールの取得と表示
+        async function displayUserProfile() {
+            try {
+                const profile = await liff.getProfile();
+                
+                // プロフィール情報を表示
+                document.getElementById('userPicture').src = profile.pictureUrl || 'https://via.placeholder.com/80';
+                document.getElementById('userName').textContent = profile.displayName;
+                document.getElementById('userId').textContent = profile.userId.substring(0, 15) + '...';
+                document.getElementById('userStatus').textContent = profile.statusMessage || 'ステータスメッセージなし';
+                
+                // プロフィール画面を表示
+                showProfileView();
+                
+                // コンソールにIDトークンを出力（開発用）
+                const idToken = liff.getIDToken();
+                console.log('ID Token:', idToken);
+                
+                // アクセストークンの取得（開発用）
+                const accessToken = liff.getAccessToken();
+                console.log('Access Token:', accessToken);
+                
+            } catch (error) {
+                console.error('プロフィール取得エラー:', error);
+                showError('プロフィールの取得に失敗しました: ' + error.message);
+            }
         }
-        
-        function click_logout() {
-            if (!liff.isLoggedIn()) return;
+
+        // ビュー切り替え
+        function showLoginView() {
+            document.getElementById('loginView').style.display = 'block';
+            document.getElementById('profileView').style.display = 'none';
+        }
+
+        function showProfileView() {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('profileView').style.display = 'block';
+        }
+
+        // ローディング表示
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.add('show');
+            } else {
+                loading.classList.remove('show');
+            }
+        }
+
+        // エラー表示
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
             
-            liff.logout();
-            update_status();
+            // 5秒後に自動で非表示
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
         }
 
-        // アプリ起動時にLIFF初期化関数を実行
-        initializeLiff();
+        // LIFF環境の確認（デバッグ用）
+        function checkLiffEnvironment() {
+            console.log('LIFF環境情報:');
+            console.log('- isInClient:', liff.isInClient());
+            console.log('- isLoggedIn:', liff.isLoggedIn());
+            console.log('- OS:', liff.getOS());
+            console.log('- Language:', liff.getLanguage());
+            console.log('- Version:', liff.getVersion());
+            console.log('- LineVersion:', liff.getLineVersion());
+        }
     </script>
-  </body>
+</body>
 </html>
